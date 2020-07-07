@@ -5,6 +5,7 @@ const { promisify } = require('util')
 const mongoose = require('mongoose')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 const Schema = mongoose.Schema
 
 
@@ -40,7 +41,9 @@ const UserSchema = new Schema({
       enum: ['Man', 'Woman', 'Other'],
       trim: true,
       required: [true, 'You should provide gender.']
-   }
+   },
+   passwordResetToken: String,
+   passwordResetExpires: Date
   
 }, {timestamps: false, versionKey: false})
 
@@ -56,6 +59,13 @@ UserSchema.methods.toJSON = function () {
    return userObject
 }
 
+UserSchema.pre('save', async function(next) {
+   // changing password
+   if (!this.isModified('password')) return next()
+   this.password = await bcrypt.hash(this.password, 10)
+   next()
+})
+
 // checking whether the hashed password matches 
 UserSchema.statics.correctPassword = async (candidate, encrypted) => {
    return await bcrypt.compare(candidate, encrypted)
@@ -69,6 +79,22 @@ UserSchema.statics.generateJWT = id => {
 // decodes JWT
 UserSchema.statics.decodeJWT = async token => {
    return await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+}
+
+// generates hashed password  reset token.
+UserSchema.methods.createPasswordResetToken = function() {
+   // generate reset token 
+   const resetToken = crypto.randomBytes(32).toString('hex')
+ 
+   // hash the token
+   this.passwordResetToken = crypto
+     .createHash('sha256')
+     .update(resetToken)
+     .digest('hex')
+ 
+   // setup expiration date of reset token.
+   this.passwordResetExpires = Date.now() + 10 * 60 * 1000
+   return resetToken
 }
 
 // export.
