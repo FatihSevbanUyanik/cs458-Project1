@@ -7,11 +7,12 @@ const { json } = require('express')
 const mongoose = require('mongoose')
 const routesAuth = require('./routes/routesAuth')
 const { globalErrorHandler } = require('./utils/ErrorHandling')
+const cors = require('cors');
 
 dotenv.config({ path: './config.env' })
 const app = express()
 app.use(json())
-
+app.use(cors());
 // =====================
 // routes
 // =====================

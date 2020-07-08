@@ -8,9 +8,8 @@ const { catchAsync } = require('../utils/ErrorHandling')
 const signUp = catchAsync(async (req, res, next) => {
    // parsing body
    const { username, email, password, birthDate, gender } = req.body
-   const passwordHashed = await bcrypt.hash(password, 10)
-   const data = { username, email, password: passwordHashed, birthDate, gender }
-      
+   const data = { username, email, password, birthDate, gender }
+
    // registering user
    const user = await User.create(data)
    if (!user) { 
@@ -28,7 +27,6 @@ const signUp = catchAsync(async (req, res, next) => {
 const signIn = catchAsync(async (req, res, next) => {
    // parsing body
    const { emailOrUsername, password } = req.body
-
    // checking whether email and password exists.
    if (!emailOrUsername || !password) { 
       return next(new ApiError('Please provide password and username.', 403))
