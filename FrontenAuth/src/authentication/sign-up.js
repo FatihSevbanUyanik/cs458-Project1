@@ -24,7 +24,6 @@ class SignUp extends React.Component{
     }
 
     clickHandler(){
-        console.log(this.state);
         if(!this.handleValidation())
             return;
 
@@ -36,20 +35,22 @@ class SignUp extends React.Component{
             gender: this.state.gender
         };
 
-        console.log(signUpRequest);
         signup(signUpRequest)
             .then(response => {
                 console.log("r- "+ response);
                 this.setState({message: 'ok'});
             }).catch(error => {
-            console.log("e- "+ error.message);
-            this.setState({message: error.message});
+            if(error.message === 'Failed to fetch')
+                this.setState({message: 'There is a problem with the server.'});
+            else
+                this.setState({message: error.message});
+            console.log(error.message);
         });
     }
 
     render() {
         if (this.state.message === 'ok')
-            return <Redirect to="/sign-in"></Redirect>
+            return <Redirect to="/sign-in"/>
 
         if(localStorage.getItem(CURRENT_USER)) {
             return <Redirect to="/"/>
@@ -65,7 +66,7 @@ class SignUp extends React.Component{
                             <h1 className="form-header text-center"> Sign up with e-mail </h1>
                             {
                                 this.state.message === '' ? <></> :
-                                    (<h2 className="text-center mt-2 mb-2">
+                                    (<h2 className="text-center mt-2 mb-2" id="error-message">
                                         {this.state.message}
                                     </h2>)
                             }
@@ -172,7 +173,9 @@ class SignUp extends React.Component{
                                 </div>
                             </div>
                             <div className="text-right">
-                                <button type="submit" className="btn btn-primary" onClick={this.clickHandler}>Sign up</button>
+                                <button type="submit" className="btn btn-primary" id="sign-up-btn" onClick={this.clickHandler}>
+                                    Sign up
+                                </button>
                             </div>
                     </div>
                 </div>

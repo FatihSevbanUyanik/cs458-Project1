@@ -42,14 +42,11 @@ class SignIn extends React.Component{
             .then(response => {
                 this.props.onLogin(response.data.user, response.data.token);
             }).catch(error => {
-            if(error.status === 401) {
-                console.log('Your Username or Password is incorrect. Please try again!');
-                return <Redirect to='/login'  />;
-
-            } else {
-                this.setState({message: error.message});
+                if(error.message === 'Failed to fetch')
+                    this.setState({message: 'There is a problem with the server.'});
+                else
+                    this.setState({message: error.message});
                 console.log(error.message);
-            }
         });
     }
 
@@ -67,7 +64,7 @@ class SignIn extends React.Component{
                         </div>
                         {
                             this.state.message === '' ? <></> :
-                                (<h2 className="text-center mt-2 mb-2">
+                                (<h2 className="text-center mt-2 mb-2" id="error-message">
                                     {this.state.message}
                                 </h2>)
                         }
@@ -90,23 +87,25 @@ class SignIn extends React.Component{
                                     <div className="form-check">
                                         <input className="form-check-input" type="checkbox" onChange={this.handleCheckbox}
                                                name="remember" id="gridCheck"/>
-                                            <label className="form-check-label" htmlFor="gridCheck">
-                                                Remember me
-                                            </label>
+                                        <label className="form-check-label" htmlFor="gridCheck">
+                                            Remember me
+                                        </label>
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <button type="submit" className="btn btn-primary" onClick={this.clickHandler} >Login</button>
+                                    <button type="submit" className="btn btn-primary" id="login-btn"onClick={this.clickHandler} >
+                                        Login
+                                    </button>
                                 </div>
                                 <div className="text-center">
-                                    <Link to="/forgot">
+                                    <Link to="/forgot" id="forgot">
                                         Forgot your password?
                                     </Link>
                                 </div>
                                 <hr/>
                                 <div className="text-center">
                                     <h3>Don't have an account?</h3>
-                                    <Link to="/sign-up">
+                                    <Link to="/sign-up" id="sign-up">
                                         Sign up for Spotify
                                     </Link>
                                 </div>
@@ -122,16 +121,16 @@ class SignIn extends React.Component{
         let isFormValid = true;
 
         if(this.state.password === ''){
-            this.setState( {vPass: 'Please enter your Spotify username or email address.'});
+            this.setState( {vPass: 'Please enter your password.'});
             isFormValid = false;
         }else
             this.setState({vPass: ''});
 
         if(this.state.emailOrUsername === ''){
-            this.setState( {vEmail: 'Please enter your password.'});
+            this.setState( {vEmail: 'Please enter your Spotify username or email address.'});
             isFormValid = false;
         }else
-            this.setState({vUsername: ''});
+            this.setState({vEmail: ''});
 
         return isFormValid;
     }

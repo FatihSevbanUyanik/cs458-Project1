@@ -2,9 +2,11 @@ import React from 'react';
 import './App.css';
 import SignIn from "./authentication/sign-in";
 import SignUp from "./authentication/sign-up";
+import Forgot from "./authentication/forgot";
 import MainPage from "./authentication/MainPage";
 import {Route, withRouter, Switch} from 'react-router-dom';
 import { ACCESS_TOKEN, CURRENT_USER, REMEMBERME} from './util/constants.js';
+import Reset from "./authentication/reset";
 
 class App extends React.Component{
     constructor(props) {
@@ -62,6 +64,18 @@ class App extends React.Component{
                            (props) => <SignUp isAuthenticated={this.state.isAuthenticated}
                                               currentUser={this.state.currentUser} {...props} />
                        }>
+                </Route>
+                <Route path="/forgot"
+                    render={
+                        (props) => <Forgot  isAuthenticated={this.state.isAuthenticated}
+                                            currentUser={this.state.currentUser} {...props} />
+                    }>
+                </Route>
+                <Route path="/reset"
+                    render={
+                        (props) => <Reset  isAuthenticated={this.state.isAuthenticated}
+                                            currentUser={this.state.currentUser} {...props} />
+                    }>
                 </Route>
                 <Route path="/"
                        render={

@@ -32,7 +32,6 @@ export function login(loginRequest) {
 }
 
 export function signup(signupRequest) {
-    console.log("su " + signupRequest.toString())
     return request({
         url:  API_BASE_URL + "/auth/signup",
         method: 'POST',
@@ -40,3 +39,18 @@ export function signup(signupRequest) {
     });
 }
 
+export function forgot(forgotRequest) {
+    return request({
+        url:  API_BASE_URL + "/auth/forgotPassword",
+        method: 'POST',
+        body: JSON.stringify(forgotRequest)
+    });
+}
+
+export function reset(resetRequest) {
+    return request({
+        url:  API_BASE_URL + "/auth/reset-password",
+        method: 'PATCH',
+        body: JSON.stringify(resetRequest)
+    });
+}
