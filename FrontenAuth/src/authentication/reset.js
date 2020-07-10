@@ -27,8 +27,9 @@ class Reset extends React.Component{
 
         reset(resetRequest)
             .then(response => {
-                console.log(response);
                 localStorage.removeItem(RESET_TOKEN);
+                this.setState({message: 'ok'});
+
             }).catch(error => {
             if(error.message === 'Failed to fetch')
                 this.setState({message: 'There is a problem with the server.'});
@@ -39,7 +40,7 @@ class Reset extends React.Component{
     }
 
     render() {
-        if(!localStorage.getItem(RESET_TOKEN)) {
+        if(!localStorage.getItem(RESET_TOKEN) || this.state.message === 'ok') {
             return <Redirect to="/"/>
         }
         else
