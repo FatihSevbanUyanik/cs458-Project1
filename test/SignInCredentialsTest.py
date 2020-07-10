@@ -21,32 +21,50 @@ class SignInCredentialsTest(unittest.TestCase):
 
     def test_search_in_python_org(self):
         driver = self.driver
-        self.pageURL = "http://www.python.org"
+        self.pageURL = "http://localhost:3000/sign-in"
 
-        self.try_connect(driver, pageURL)
+        self.userInputId = "exampleInputUserId"
+        self.passwordInputId = "exampleInputPassword1"
 
-        test_logs = []
+        self.try_connect(driver, self.pageURL)
 
+        self.test_logs = []
         # check conditions
 
         # username = ""
         # password = ""
-        test_login(driver, test_logs, username="", password="", className="SignInCredentialsTest")
+        self.test_login_credentials(driver, "", "", "SignInCredentialsTest")
 
-        # username = ""
-        # password = "12345"
-        test_login(driver, test_logs, username="", password="12345", className="SignInCredentialsTest")
+        # username = "enes"
+        # password = "12"
+        self.test_login_credentials(driver, "", "12", "SignInCredentialsTest")
 
-        # username = "username"
+        # username = "enes"
         # password = ""
-        test_login(driver, test_logs, username="username", password="", className="SignInCredentialsTest")
+        self.test_login_credentials(driver, "enes", "", "SignInCredentialsTest")
 
-        # username = "username"
+        # username = "enes"
         # password = "12345"
-        test_login(driver, test_logs, username="", password="12345", className="SignInCredentialsTest")
+        self.test_login_credentials(driver, "enes", "12345", "SignInCredentialsTest")
 
-        write_logs_file(test_logs, "SignInCredentialsTest")
+        # username = "enes"
+        # password = "123456"
+        self.test_login_credentials(driver, "enes", "123456", "SignInCredentialsTest")
 
+        # Check remember me feature
+        # username = "enes"
+        # password = "123456"
+        self.test_login_remember_me(driver, "enes", "123456", "SignInCredentialsTest")
+
+        self.write_logs_file(self.test_logs, "SignInCredentialsTest")
+
+    def test_login_remember_me(self, driver, username, password, className):
+        result_login = self.test_login(driver, username, password, className, True)
+
+        result = datetime.datetime.now().strftime("%c") + ":\n" + className + ": \n" \
+            + "username=" + username + "\npassword=" + password + "\nlogged_in: " + result_login["isLoggedIn"] + "\nerror: " + result_login["error"] \
+            + "\nRemember me feature works: " + str(result_login["rememberMeWorks"]) + "\n***************************"
+        self.test_logs.append(result)
     def write_logs_file(self, logs, className):
         try:
             with open(className + "_logs.txt", "w", encoding="UTF-8") as file:
@@ -55,41 +73,69 @@ class SignInCredentialsTest(unittest.TestCase):
         except:
             print(className + "An error is occured while writing log file")
 
-    def test_login(self, driver, logs, username, password, className):
+    def test_login_credentials(self, driver, username, password, className):
+        result_login = self.test_login(driver, username, password, className, False)
+
+        result = datetime.datetime.now().strftime("%c") + ":\n" + className + ": \n" \
+            + "username=" + username + "\npassword=" + password + "\nlogged_in: " + result_login["isLoggedIn"] + "\nerror: " + result_login["error"] \
+            + "\n***************************"
+        self.test_logs.append(result)
+
+    def test_login(self, driver, username, password, className, checkRememberMe):
         error = ""
+        remember_me = False
+        logged_in = False
+        remember_me_works = False
+
         try:
             # get the username element
-            # username_input = driver.find_element_by_xpath(...)
+            username_input = driver.find_element_by_id(self.userInputId)
 
             # fill the username element
-            # username_input.send_keys(username)
+            username_input.clear()
+            username_input.send_keys(username)
 
             # get the password element
-            # password_input = driver.find_element_by_xpath(...)
+            password_input = driver.find_element_by_id(self.passwordInputId)
 
             # fill the password element
-            # password_input.send_keys(password)
+            password_input.clear()
+            password_input.send_keys(password)
+
+            remember_me_checkbox = driver.find_element_by_id("gridCheck")
+            if ( not remember_me_checkbox.is_selected() & checkRememberMe):
+                remember_me_checkbox.click()
 
             # click login
-            # login_button = driver.find_element_by_xpath(...)
-            # login_button.click()
+            login_button = driver.find_element_by_id("login-btn")
+            login_button.click()
+            print("Checkbox: " + str(remember_me_checkbox.is_selected()), end="\n")
 
             # check whether a new page has opened or not
             # wait for 5 sec
             time.sleep(5)
-            
+
             logged_in = True
-            if self.pageURL != driver.current_url :
+            if self.pageURL == driver.current_url:
                 logged_in = False
+            else:
+                # driver.get(self.pageURL)  --> Old method
+                driver.find_element_by_id("logout-button").click()
+                if checkRememberMe:
+                    username_input_compare = driver.find_element_by_id(self.userInputId).text
+                    password_input_compare = driver.find_element_by_id(self.passwordInputId).text
+                    # if username_input_compare == username_input.text & password_input_compare == password_input.text:
+                    #     remember_me_works = True
+                    if ((not (username_input_compare != "")) & (not (password_input_compare != ""))):
+                        remember_me_works = True
+                
         except Exception as e:
             error = str(e)
-        
-        if error == "":
-            error = "No Error"
-
-        result = datetime.datetime.now().strftime("%c") + ":" + className + ": \n" \
-            + "username=" + username + "\npassword=" + password + "\nlogged_in: " + logged_in + "\nerror: " + error
-        return
+        finally:
+            if error == "":
+                error = "No Error"
+            
+            return {"isLoggedIn": str(logged_in), "error": error, "rememberMeWorks": remember_me_works}
 
     def try_connect(self, driver, pageURL):
         try:

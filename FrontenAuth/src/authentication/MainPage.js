@@ -16,7 +16,7 @@ class MainPage extends React.Component{
                         <hr className="my-4"/>
                         <h1>No matter how hard you work, it's not enough for Bilkent!</h1>
                         <p>Now that you know the secret, you can listen to music from Spotify</p>
-                        <button type="button" className="btn btn-primary btn-lg" onClick={this.props.onLogout}>Logout</button>
+                        <button type="button" className="btn btn-primary btn-lg" id="logout-button" onClick={this.props.onLogout}>Logout</button>
                     </div>
                 </div>
              );
