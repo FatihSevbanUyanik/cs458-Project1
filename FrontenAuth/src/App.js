@@ -5,7 +5,7 @@ import SignUp from "./authentication/sign-up";
 import Forgot from "./authentication/forgot";
 import MainPage from "./authentication/MainPage";
 import {Route, withRouter, Switch} from 'react-router-dom';
-import { ACCESS_TOKEN, CURRENT_USER, REMEMBERME} from './util/constants.js';
+import { ACCESS_TOKEN, CURRENT_USER} from './util/constants.js';
 import Reset from "./authentication/reset";
 
 class App extends React.Component{
@@ -19,12 +19,6 @@ class App extends React.Component{
         this.handleLogin = this.handleLogin.bind(this)
     }
 
-    componentWillMount(){
-        if (!localStorage.getItem(REMEMBERME)){
-            localStorage.removeItem(ACCESS_TOKEN);
-            localStorage.removeItem(CURRENT_USER);
-        }
-    }
 
     handleLogout() {
         localStorage.removeItem(ACCESS_TOKEN);
@@ -39,8 +33,6 @@ class App extends React.Component{
     }
 
     handleLogin(user, token) {
-        console.log(user);
-        console.log(token);
         localStorage.setItem(ACCESS_TOKEN, token);
         localStorage.setItem(CURRENT_USER, user);
         this.setState({

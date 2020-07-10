@@ -3,18 +3,23 @@ import './sign-in.css';
 import {login} from "../util/APIUtil.js"
 import {Redirect} from 'react-router-dom';
 import {Link} from 'react-router-dom'
-import {CURRENT_USER} from "../util/constants";
-import {REMEMBERME} from "../util/constants";
+import {CURRENT_USER, REMEMBER_ME, EMAIL_OR_USERNAME, PASSWORD} from "../util/constants";
 
 class SignIn extends React.Component{
     constructor(props){
         super(props);
-        this.state = {emailOrUsername: '', password: '', remember: '', message: '',
+        this.state = {emailOrUsername: '', password: '', remember: false, message: '',
                       vEmail: '', vPass: ''};
+        if (localStorage.getItem(REMEMBER_ME)){
+            this.state.emailOrUsername = localStorage.getItem(EMAIL_OR_USERNAME);
+            this.state.password = localStorage.getItem(PASSWORD);
+            this.state.remember = true;
+        }
         this.handleChange = this.handleChange.bind(this);
         this.clickHandler = this.clickHandler.bind(this);
         this.handleCheckbox = this.handleCheckbox.bind(this);
     }
+
 
     handleChange(event){
         this.setState({[event.target.name]: event.target.value});
@@ -33,10 +38,16 @@ class SignIn extends React.Component{
             password: this.state.password
         };
 
-        if (this.state.remember === true)
-            localStorage.setItem(REMEMBERME, 'true');
-        else
-            localStorage.removeItem(REMEMBERME);
+        if (this.state.remember === true){
+            localStorage.setItem(REMEMBER_ME, 'true');
+            localStorage.setItem(EMAIL_OR_USERNAME, this.state.emailOrUsername)
+            localStorage.setItem(PASSWORD, this.state.password);
+        }
+        else{
+            localStorage.removeItem(REMEMBER_ME);
+            localStorage.removeItem(EMAIL_OR_USERNAME);
+            localStorage.removeItem(PASSWORD);
+        }
 
         login(loginRequest)
             .then(response => {
@@ -55,6 +66,7 @@ class SignIn extends React.Component{
         if(localStorage.getItem(CURRENT_USER)) {
             return <Redirect to="/"/>
         }
+
         return(
             <div className="container mt-5 pt-5">
                 <div className="row justify-content-center mt-5 pt-5" id="login-form">
@@ -86,7 +98,7 @@ class SignIn extends React.Component{
                                 <div className="form-group">
                                     <div className="form-check">
                                         <input className="form-check-input" type="checkbox" onChange={this.handleCheckbox}
-                                               name="remember" id="gridCheck"/>
+                                               name="remember" id="gridCheck" checked={this.state.remember}/>
                                         <label className="form-check-label" htmlFor="gridCheck">
                                             Remember me
                                         </label>
