@@ -86,14 +86,14 @@ class SignIn extends React.Component{
                                     <input type="text" className={this.state.vEmail === '' ? "form-control" : "form-control is-invalid"}
                                            name="emailOrUsername" id="exampleInputUserId" placeholder="example@gmail.com or example123"
                                            onChange={this.handleChange} value = {this.state.emailOrUsername}/>
-                                   <div className="invalid-feedback">{this.state.vEmail}</div>
+                                   <div className="invalid-feedback" id="vEmailMessage">{this.state.vEmail}</div>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="exampleInputPassword1">Password</label>
                                     <input type="password" className={this.state.vPass === '' ? "form-control" : "form-control is-invalid"}
                                            name="password" id="exampleInputPassword1" placeholder="********"
                                            onChange={this.handleChange} value = {this.state.password}/>
-                                    <div className="invalid-feedback">{this.state.vPass}</div>
+                                    <div className="invalid-feedback" id="vPassMessage">{this.state.vPass}</div>
                                 </div>
                                 <div className="form-group">
                                     <div className="form-check">

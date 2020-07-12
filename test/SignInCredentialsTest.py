@@ -105,6 +105,10 @@ class SignInCredentialsTest(unittest.TestCase):
         logged_in = False
         remember_me_works = False
         
+        password_message_is_displayed = False
+        username_message_is_displayed = False
+
+
         try:
             # get the username element
             username_input = driver.find_element_by_id(self.userInputId)
@@ -136,6 +140,12 @@ class SignInCredentialsTest(unittest.TestCase):
             logged_in = True
             if self.pageURL == driver.current_url:
                 logged_in = False
+                password_message = driver.find_element_by_id("vPassMessage")
+                if password_message != "":
+                    password_message_is_displayed = True
+                username_message = driver.find_element_by_id("vEmailMessage")
+                if username_message != "":
+                    username_message_is_displayed = True
             else:
                 # driver.get(self.pageURL)  --> Old method
                 time.sleep(3)
@@ -143,8 +153,6 @@ class SignInCredentialsTest(unittest.TestCase):
                 if checkRememberMe:
                     username_input_compare = driver.find_element_by_id(self.userInputId).text
                     password_input_compare = driver.find_element_by_id(self.passwordInputId).text
-                    # if username_input_compare == username_input.text & password_input_compare == password_input.text:
-                    #     remember_me_works = True
                     if ((not (username_input_compare != "")) & (not (password_input_compare != ""))):
                         remember_me_works = True
                 
@@ -154,7 +162,8 @@ class SignInCredentialsTest(unittest.TestCase):
             if error == "":
                 error = "No Error"
             
-            return {"isLoggedIn": str(logged_in), "error": error, "rememberMeWorks": remember_me_works}
+            return {"isLoggedIn": str(logged_in), "error": error, "rememberMeWorks": remember_me_works,
+                    "username_message": str(username_message_is_displayed), "password_message": str(password_message_is_displayed)}
         
     def test_forgot_password(self, driver, email, newPassword):
         # wating the page to load.
