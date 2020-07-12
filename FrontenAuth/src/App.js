@@ -19,7 +19,6 @@ class App extends React.Component{
         this.handleLogin = this.handleLogin.bind(this)
     }
 
-
     handleLogout() {
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem(CURRENT_USER);
