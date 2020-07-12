@@ -22,6 +22,8 @@ class Tester:
       self.login_button_id = "login-btn"
       self.logout_button_id = "logout-button"
       self.remember_me_check_box_id = 'gridCheck'
+      self.username_warning_message_id = "vEmailMessage"
+      self.password_warning_message_id = "vPassMessage"
 
       # forgot password properties
       self.forgot_password_link_id = "forgot"
@@ -30,7 +32,6 @@ class Tester:
       self.reset_password_input_id = "exampleInputPassword1"
       self.reset_password_email_input_id = "exampleInputUserId"
       self.reset_password_confirm_input_id = "exampleInputPassword2"
-      
    
    def setup_tester(self):
       try:
@@ -91,7 +92,10 @@ class Tester:
       error = ""
       is_logged_in = False
       remember_me_works = False
-   
+
+      username_warning_message_is_displayed = False
+      password_warning_message_is_displayed = False
+
       try:
          email_or_username_input = self.driver.find_element_by_id(self.email_or_username_input_id)
          remember_me_check_box = self.driver.find_element_by_id(self.remember_me_check_box_id)
@@ -120,13 +124,18 @@ class Tester:
             is_logged_in = True
             time.sleep(3)
       
-         if check_remember_me:
-            email_or_username_input = self.driver.find_element_by_id(self.email_or_username_input_id)
-            password_input = self.driver.find_element_by_id(self.password_input_id)
-            username_input_compare = email_or_username_input.text
-            password_input_compare = password_input.text
-            if ((not (username_input_compare != "")) & (not (password_input_compare != ""))):
-               remember_me_works = True
+            if check_remember_me:
+               email_or_username_input = self.driver.find_element_by_id(self.email_or_username_input_id)
+               password_input = self.driver.find_element_by_id(self.password_input_id)
+               username_input_compare = email_or_username_input.text
+               password_input_compare = password_input.text
+               if ((not (username_input_compare != "")) & (not (password_input_compare != ""))):
+                  remember_me_works = True
+         else:
+            if self.driver.find_element_by_id(self.username_warning_message_id) != "":
+               username_warning_message_is_displayed = True
+            if self.driver.find_element_by_id(self.password_warning_message_id) != "":
+               password_warning_message_is_displayed = True
    
       except Exception as e:
          print(str(e))
@@ -141,7 +150,9 @@ class Tester:
          'is_logged_in': str(is_logged_in), 
          'username_or_email': username_or_email,
          'remember_me_works': str(remember_me_works), 
-         'check_remember_me': str(check_remember_me)
+         'check_remember_me': str(check_remember_me),
+         'username_warning': str(username_warning_message_is_displayed),
+         'password_warning': str(password_warning_message_is_displayed)
       }
    
       self.add_to_logs(result_dict, True)
@@ -150,10 +161,28 @@ class Tester:
    def add_to_logs(self, result_dict, is_log_in): 
       date = datetime.datetime.now().strftime("%c")
       result = f"{date}:\n" + f"{self.class_name}:\n"
-   
-      if is_log_in: 
-         result += f"username_or_email={ result_dict['username_or_email'] }\n" +\
-                   f"password={ result_dict['password'] }\n" +\
+      if is_log_in:
+         username_log = ""
+         password_log = ""
+
+         if result_dict['username_or_email'] == "":
+            if result_dict['username_warning'] == "True":
+               username_log = "Username empty warning was displayed\n"
+            else:
+               username_log = "Username empty warning was NOT displayed\n"
+         else:
+            username_log = f"username_or_email={ result_dict['username_or_email'] }\n"
+
+         if result_dict['password'] == "":
+            if result_dict['password_warning'] == "True":
+               password_log = "password empty warning was displayed\n"
+            else:
+               password_log = "password empty warning was NOT displayed\n"
+         else:
+            password_log = f"password={ result_dict['password'] }\n"
+             
+         result += username_log +\
+                   password_log +\
                    f"is_logged_in: { result_dict['is_logged_in'] }\n" +\
                    f"error: { result_dict['error'] }\n"
             
@@ -236,6 +265,8 @@ class Tester:
       # password = "123456"
       # =========================================
       self.test_forgot_password('fatihsevban15@gmail.com', 'naruto1212')
+
+
       self.write_logs_file()
       self.tearDown()
 
